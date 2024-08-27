@@ -1,36 +1,44 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Tile : MonoBehaviour
 {
-    public Texture[] textures;
     public enum tileType { grass, dirt, water };
     public tileType currentTileType;
 
-    public Player owner = null;
+    [Serializable]
+    public struct TileData
+    {
+        public tileType type;
+        public Texture texture;
+    }
+
+    [SerializeField]
+    private TileData[] tileData;
+    [SerializeField]
+    private GameObject spawnableAreaObject;
+
+    private Player owner = null;
+    private bool isSpawnableTile = false;
+
+    private Vector2Int position;
 
     private void Start()
     {
-        currentTileType = tileType.grass;
+        ChangeTile(tileType.grass);
     }
 
     public void ChangeTile(tileType newType)
     {
-        currentTileType = newType;
-        GetComponent<MeshRenderer>().material.mainTexture = textures[(int)currentTileType];
-        
-        switch (newType) 
+        for(int i = 0; i < tileData.Length; i++)
         {
-            case tileType.grass:
-               
-                break;
-            case tileType.dirt:
-                break;
-            case tileType.water:
-                break;
-            default:
-                break;
+            if (tileData[i].type == newType)
+            {
+                currentTileType = newType;
+                GetComponent<MeshRenderer>().material.mainTexture = tileData[i].texture;
+            }
         }
     }
 
@@ -44,4 +52,20 @@ public class Tile : MonoBehaviour
         owner = newOwner;
     }
 
+    public bool IsSpawnable
+    {
+        get { return isSpawnableTile; }
+        set { isSpawnableTile = value; }
+    }
+
+    public void ShowHideSpawnableArea()
+    {
+        spawnableAreaObject.SetActive(!spawnableAreaObject.activeSelf);
+    }
+
+    public Vector2Int Position
+    {
+        get { return position; }
+        set { position = value; }
+    }
 }

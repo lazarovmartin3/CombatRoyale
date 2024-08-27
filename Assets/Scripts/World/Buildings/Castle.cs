@@ -31,6 +31,7 @@ public class Castle : MonoBehaviour
     public void SetOwner(Player owner)
     {
         this.owner = owner;
+        CreateSpawnableArea();
     }
 
     public Player GetOwner()
@@ -41,6 +42,7 @@ public class Castle : MonoBehaviour
     public void SetGridPosition(int x, int y)
     {
         position = new Vector2Int(x, y);
+        Map.Instance.ChangeOwner(x, y, owner);
     }
 
     public Vector2Int GetPosition()
@@ -59,6 +61,25 @@ public class Castle : MonoBehaviour
         {
             print("Not enough gold! Need " + (goldPerLevel[currentLevel + 1] - owner.GetGold()));
         }
+    }
+
+    public void ShowHideSpawnPositions()
+    {
+        List<Tile> areas = new List<Tile>(SpawnableAreaCreator.Instance.GetSpawnableArea(owner));
+        foreach(Tile tile in areas)
+        {
+            tile.ShowHideSpawnableArea();
+        }
+    }
+
+    public void PrepareForSpawning(UnitCreator.UnitType unitType)
+    {
+        GetComponent<UnitCreator>().ActivateSpawning(unitType);
+    }
+
+    private void CreateSpawnableArea()
+    {
+        SpawnableAreaCreator.Instance.CreateSpanwableAreaAround(position.x, position.y, owner);
     }
 
     public void CreateUnit(UnitCreator.UnitType unitType)

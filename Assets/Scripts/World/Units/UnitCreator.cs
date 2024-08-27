@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class UnitCreator : MonoBehaviour
 {
-    public enum UnitType { swordman, range, healer, builder, tank };
+    public enum UnitType { swordman, range, healer, builder, tank , NaN };
 
     [Serializable]
     public struct UnitTypes
@@ -16,13 +16,15 @@ public class UnitCreator : MonoBehaviour
 
     [SerializeField]
     private UnitTypes[] unitTypesSetup;
-    
+
     private Dictionary<UnitType, GameObject> unitsByTypeList = new Dictionary<UnitType, GameObject>();
 
-
+    private List<UnitType> createdUnits = new List<UnitType>();
     private List<UnitType> unitsQueue = new List<UnitType>();
     private float creationTime = 2;
     private float creationTimeElapsed = 0;
+
+    private UnitType selectedUnitToSpawn;
 
     private void Start()
     {
@@ -35,6 +37,12 @@ public class UnitCreator : MonoBehaviour
     public void CreateUnit(UnitType unitType)
     {
         unitsQueue.Add(unitType);
+    }
+
+    public void ActivateSpawning(UnitType unitType)
+    {
+        TileSelector.OnTileSelectionEvent += SpawnUnit;
+        selectedUnitToSpawn = unitType;
     }
 
     private void Update()
@@ -52,6 +60,12 @@ public class UnitCreator : MonoBehaviour
 
     private void AddUnit()
     {
+        createdUnits.Add(unitsQueue[0]);
+        unitsQueue.RemoveAt(0);
+    }
+
+    public void SpawnUnit()
+    {
         unitsByTypeList.TryGetValue(unitsQueue[0], out GameObject prefab);
         GameObject unit = Instantiate(prefab, transform.position, Quaternion.identity);
         unit.GetComponent<Unit>().SetType(unitsQueue[0]);
@@ -63,5 +77,34 @@ public class UnitCreator : MonoBehaviour
         Vector2Int targetPos = GetComponent<Castle>().GetPosition();
         targetPos = Map.Instance.GetTileInFront(targetPos.x, targetPos.y);
         unit.GetComponent<Unit>().GoTo(targetPos);
+    }
+
+    public void SpawnUnit(GameObject tile)
+    {
+        UnitType type = UnitType.NaN;
+        foreach(UnitType unit in createdUnits)
+        {
+            if (unit == selectedUnitToSpawn)
+            {
+                type = unit;
+                break;
+            }
+        }
+
+        if(type != UnitType.NaN)
+        {
+            unitsByTypeList.TryGetValue(type, out GameObject prefab);
+            GameObject unitObject = Instantiate(prefab, transform.position, Quaternion.identity);
+            unitObject.GetComponent<Unit>().SetType(type);
+            unitObject.GetComponent<Unit>().SetPosition(tile.GetComponent<Tile>().Position);
+            unitObject.GetComponent<Unit>().SetOwner(GetComponent<Castle>().GetOwner());
+            createdUnits.Remove(type);
+            GetComponent<Castle>().AssignUnitToPlayer(unitObject.GetComponent<Unit>());
+
+            //Vector2Int targetPos = GetComponent<Castle>().GetPosition();
+            //targetPos = Map.Instance.GetTileInFront(targetPos.x, targetPos.y);
+            //unit.GetComponent<Unit>().GoTo(targetPos);
+        }
+        TileSelector.OnTileSelectionEvent -= SpawnUnit;
     }
 }

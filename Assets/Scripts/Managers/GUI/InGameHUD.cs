@@ -9,6 +9,8 @@ public class InGameHUD : MonoBehaviour
     public TextMeshProUGUI goldAmountTxt;
     public Button soldierBtn;
 
+    [SerializeField]
+    private Button spawnSwordman;
 
     private void Start()
     {
@@ -18,5 +20,11 @@ public class InGameHUD : MonoBehaviour
     private void Update()
     {
         goldAmountTxt.text = GameManager.Instance.GetPlayer().GetGold().ToString();
+    }
+
+    private void SpawnSwordman()
+    {
+        GameManager.Instance.GetPlayer().GetSelectedCastle().ShowHideSpawnPositions();
+        GameManager.Instance.GetPlayer().GetSelectedCastle().PrepareForSpawning(UnitCreator.UnitType.swordman);
     }
 }

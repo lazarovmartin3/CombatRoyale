@@ -30,6 +30,14 @@ public class Unit : MonoBehaviour
     private bool canAttack = true;
     private Player owner;
 
+    private Animator animator;
+
+
+    private void Start()
+    {
+        animator = GetComponent<Animator>();
+    }
+
     public void SetType(UnitCreator.UnitType unitType)
     {
         this.unitType = unitType;
@@ -115,11 +123,13 @@ public class Unit : MonoBehaviour
 
     private void HandleIdleState()
     {
+        animator.SetBool("idle", true);
         idleTimeElapsed += Time.deltaTime;
         if (idleTimeElapsed >= maxIdleTime)
         {
             idleTimeElapsed = 0;
             currentState = States.wondering;
+            animator.SetBool("idle", false);
         }
     }
 
@@ -170,18 +180,6 @@ public class Unit : MonoBehaviour
         }
     }
 
-    private void HandleAttackState()
-    {
-        if (canAttack && target != null)
-        {
-            PerformAttack();
-        }
-        else
-        {
-            TransitionToState(States.idle);
-        }
-    }
-
     private void TransitionToState(States newState)
     {
         currentState = newState;
@@ -189,7 +187,7 @@ public class Unit : MonoBehaviour
 
     private Transform FindClosestTarget()
     {
-        Transform closestTarget = UnitsManager.Instance.GetClosestUnit(owner, GetPosition())?.transform;
+        Transform closestTarget = UnitsManager.Instance?.GetClosestUnit(owner, GetPosition())?.transform;
 
         if (closestTarget == null)
         {
@@ -228,6 +226,7 @@ public class Unit : MonoBehaviour
         Vector3 direction = (targetPosition - transform.position).normalized;
         transform.position += direction * movingSpeed * Time.deltaTime;
         transform.LookAt(target);
+        animator.SetBool("walk", true);
 
         if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
         {
@@ -238,16 +237,41 @@ public class Unit : MonoBehaviour
         if (pathIndex >= path.Count)
         {
             currentState = States.idle;
+            animator.SetBool("walk", false);
+        }
+
+        if (target == null)
+        {
+            currentState = States.idle;
+            pathIndex = 0;
+            animator.SetBool("walk", false);
+        }
+    }
+
+    private void HandleAttackState()
+    {
+        if (canAttack && target != null)
+        {
+            PerformAttack();
+        }
+        else
+        {
+            TransitionToState(States.idle);
         }
     }
 
     private void PerformAttack()
     {
-        if (target == null) return;
+        if (target == null)
+        {
+            currentState = States.idle;
+            return;
+        }
 
         // Check if the target is within attack range
         if (Vector3.Distance(transform.position, target.position) <= attackRange)
         {
+            animator.SetTrigger("attack");
             // Deal damage to the target
             target.GetComponent<Health>().TakeDamage(attackDamage);
             Debug.Log("Attacked and dealt " + attackDamage + " damage");

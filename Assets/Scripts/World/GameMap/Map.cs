@@ -33,6 +33,7 @@ public class Map : MonoBehaviour
                 GameObject tile = Instantiate(tilePrefab, position, Quaternion.identity);
                 tile.name = $"{ x + "," + y}";
                 tile.transform.SetParent(this.transform);
+                tile.GetComponent<Tile>().Position = new Vector2Int(x, y);
 
                 bool walkable = true;
                 grid[x, y] = new Node(x, y, walkable, position);
@@ -40,6 +41,9 @@ public class Map : MonoBehaviour
             }
         }
     }
+
+    public int MapSizeX() { return sizeX; }
+    public int MapSizeY() {  return sizeY; }
 
     public Vector3 GetPosition(int x, int y)
     {
@@ -57,6 +61,17 @@ public class Map : MonoBehaviour
     {
         field[x,y].GetComponent<Tile>().SetOwner(newOwner);
         grid[x, y].walkable = false;
+    }
+
+    public void SetSpawnableTile(int x, int y, bool value, Player owner)
+    {
+        field[x,y].GetComponent<Tile>().IsSpawnable = value;
+        field[x, y].GetComponent<Tile>().SetOwner(owner);
+    }
+
+    public Tile GetTileAt(int x, int y)
+    {
+        return field[x, y].GetComponent<Tile>();
     }
 
     public List<Node> FindPath(Vector3 startPos, Vector3 targetPos)
