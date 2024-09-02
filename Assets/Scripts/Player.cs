@@ -2,15 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public abstract class Player : MonoBehaviour
 {
-    private int gold;
-    private Castle mainCastle;
-    private List<Tower> towers;
-    private List<Unit> units;
-    private GameManager.PlayerInitData playerInitData;
+    protected int gold;
+    protected Castle mainCastle;
+    protected List<Tower> towers;
+    protected List<Unit> units;
+    protected GameManager.PlayerInitData playerInitData;
 
-    public void InitPlayer(int startGold, Castle castle, GameManager.PlayerInitData initData)
+    public virtual void InitPlayer(int startGold, Castle castle, GameManager.PlayerInitData initData)
     {
         gold = startGold;
         mainCastle = castle;
@@ -53,8 +53,6 @@ public class Player : MonoBehaviour
 
     public int GetGold() { return gold; }
 
-    public Castle GetSelectedCastle()
-    {
-        return mainCastle;
-    }
+    public abstract Castle GetSelectedCastle();
+
 }

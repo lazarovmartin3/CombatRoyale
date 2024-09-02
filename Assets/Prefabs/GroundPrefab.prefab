@@ -125,6 +125,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentTileType: 0
   tileData: []
+  spawnableAreaObject: {fileID: 0}
 --- !u!1 &2573536105430395779
 GameObject:
   m_ObjectHideFlags: 0

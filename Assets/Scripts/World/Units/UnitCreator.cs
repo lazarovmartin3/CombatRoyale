@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class UnitCreator : MonoBehaviour
@@ -24,7 +25,7 @@ public class UnitCreator : MonoBehaviour
     private float creationTime = 2;
     private float creationTimeElapsed = 0;
 
-    private UnitType selectedUnitToSpawn;
+    //private UnitType selectedUnitToSpawn;
 
     private void Start()
     {
@@ -37,19 +38,24 @@ public class UnitCreator : MonoBehaviour
     public void CreateUnit(UnitType unitType)
     {
         unitsQueue.Add(unitType);
+        //Consider to limit the queue up to 5 units
+        UpdateOrderedUnitsUI();
     }
 
-    public void ActivateSpawning(UnitType unitType)
-    {
-        TileSelector.OnTileSelectionEvent += SpawnUnit;
-        selectedUnitToSpawn = unitType;
-    }
+    //public void ActivateSpawning(UnitType unitType)
+    //{
+    //    TileSelector.OnTileSelectionEvent += SpawnUnit;
+    //    selectedUnitToSpawn = unitType;
+    //}
 
     private void Update()
     {
         if(unitsQueue.Count > 0)
         {
             creationTimeElapsed += Time.deltaTime;
+            if (GetComponent<Castle>().GetOwner() is HumanPlayer) 
+                UnitCreationSystemUI.Instance.UpdateUnitCreationProgress(unitsQueue[0], (creationTimeElapsed / creationTime));
+            
             if (creationTimeElapsed > creationTime)
             {
                 creationTimeElapsed = 0;
@@ -62,6 +68,67 @@ public class UnitCreator : MonoBehaviour
     {
         createdUnits.Add(unitsQueue[0]);
         unitsQueue.RemoveAt(0);
+
+        UpdateCreatedUnitsUI();
+        UpdateOrderedUnitsUI();
+    }
+
+    private void UpdateCreatedUnitsUI()
+    {
+        if (GetComponent<Castle>().GetOwner() is AIPlayer) return;
+
+        Dictionary<UnitType, int> ready_units = new Dictionary<UnitType, int>();
+
+        for (int i = 0; i < createdUnits.Count; i++)
+        {
+            UnitType unitType = createdUnits[i];
+            if (ready_units.ContainsKey(unitType))
+            {
+                ready_units[createdUnits[i]] += 1;
+            }
+            else
+            {
+                ready_units[unitType] = 1;
+            }
+        }
+        foreach (var kvp in ready_units)
+        {
+            UnitCreationSystemUI.Instance.UpdateCreatedUnitsAmount(kvp.Key, kvp.Value);
+        }
+    }
+
+    private void UpdateOrderedUnitsUI()
+    {
+        if (GetComponent<Castle>().GetOwner() is AIPlayer) return;
+
+        Dictionary<UnitType, int> queue_units = new Dictionary<UnitType, int>();
+
+        if (unitsQueue.Count > 0)
+        {
+            for (int i = 0; i < unitsQueue.Count; i++)
+            {
+                UnitType unitType_ = unitsQueue[i];
+                if (queue_units.ContainsKey(unitType_))
+                {
+                    queue_units[unitsQueue[i]] += 1;
+                }
+                else
+                {
+                    queue_units[unitType_] = 1;
+                }
+            }
+            foreach (var kvp in queue_units)
+            {
+                UnitCreationSystemUI.Instance.UpdateOrderUnitsAmount(kvp.Key, kvp.Value);
+            }
+        }
+        else
+        {
+            foreach (var unitType in unitTypesSetup)
+            {
+                UnitCreationSystemUI.Instance.UpdateOrderUnitsAmount(unitType.unitType, 0);
+            }
+        }
     }
 
     public void SpawnUnit()
@@ -84,11 +151,11 @@ public class UnitCreator : MonoBehaviour
         UnitType type = UnitType.NaN;
         foreach(UnitType unit in createdUnits)
         {
-            if (unit == selectedUnitToSpawn)
-            {
-                type = unit;
-                break;
-            }
+            //if (unit == selectedUnitToSpawn)
+            //{
+            //    type = unit;
+            //    break;
+            //}
         }
 
         if(type != UnitType.NaN)

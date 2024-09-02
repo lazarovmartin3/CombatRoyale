@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -36,29 +37,42 @@ public class GameManager : MonoBehaviour
         Map.Instance.GenerateMap();
 
         CreateNewPlayer(5, 0, new Vector3(-90, -180, 90), GetDataByColor(PlayerColors.blue));
-        CreateNewPlayer(5, 9, new Vector3(-90, 0, 90), GetDataByColor(PlayerColors.green));
+        CreateNewPlayer(5, 9, new Vector3(-90, 0, 90), GetDataByColor(PlayerColors.green), true);
     }
 
-    private void CreateNewPlayer(int posX, int posY, Vector3 rotation, PlayerInitData data)
+    private void CreateNewPlayer(int posX, int posY, Vector3 rotation, PlayerInitData data, bool isAI = false)
     {
         GameObject playerObject = new GameObject();
         playerObject.transform.SetParent(this.transform);
-        playerObject.name = "Player_" + players.Count;
-        playerObject.AddComponent<Player>();
+        playerObject.name = isAI ? "AI_Player_" + players.Count : "Player_" + players.Count;
+
         GameObject castle = Instantiate(castlePrefab, Map.Instance.GetPosition(posX, posY), Quaternion.Euler(rotation), playerObject.transform);
-        castle.GetComponent<Castle>().SetOwner(playerObject.GetComponent<Player>());
-        castle.GetComponent<Castle>().SetGridPosition(posX, posY);
-        playerObject.GetComponent<Player>().InitPlayer(START_GOLD, castle.GetComponent<Castle>(), data);
-        players.Add(playerObject.GetComponent<Player>());
-        if (players.Count > 1)
+
+        if (isAI)
         {
-            players[1].AddComponent<AI_Player>();
+            playerObject.AddComponent<AIPlayer>();
+            castle.GetComponent<Castle>().SetOwner(playerObject.GetComponent<AIPlayer>());
+            playerObject.GetComponent<AIPlayer>().InitPlayer(START_GOLD, castle.GetComponent<Castle>(), data);
+            players.Add(playerObject.GetComponent<AIPlayer>());
         }
+        else
+        {
+            playerObject.AddComponent<HumanPlayer>();
+            castle.GetComponent<Castle>().SetOwner(playerObject.GetComponent<HumanPlayer>());
+            playerObject.GetComponent<HumanPlayer>().InitPlayer(START_GOLD, castle.GetComponent<Castle>(), data);
+            players.Add(playerObject.GetComponent<HumanPlayer>());
+        }
+        castle.GetComponent<Castle>().SetGridPosition(posX, posY);
     }
 
-    public Player GetPlayer()
+    public HumanPlayer GetPlayer()
     {
-        return players[0];
+        foreach (Player player in players)
+        {
+            if (player is HumanPlayer)
+                return player as HumanPlayer;
+        }
+        return null;
     }
 
     public List<Player> GetAllPlayers()

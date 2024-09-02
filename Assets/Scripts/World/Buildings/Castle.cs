@@ -74,7 +74,7 @@ public class Castle : MonoBehaviour
 
     public void PrepareForSpawning(UnitCreator.UnitType unitType)
     {
-        GetComponent<UnitCreator>().ActivateSpawning(unitType);
+        //GetComponent<UnitCreator>().ActivateSpawning(unitType);
     }
 
     private void CreateSpawnableArea()
@@ -92,6 +92,7 @@ public class Castle : MonoBehaviour
         else
         {
             print("Not enough gold!");
+            //Implement a message logic
         }
     }
 
