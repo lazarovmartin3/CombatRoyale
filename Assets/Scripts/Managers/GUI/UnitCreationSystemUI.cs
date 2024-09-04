@@ -44,7 +44,7 @@ public class UnitCreationSystemUI : MonoBehaviour
             unitCreationAndSpawningDatas[index].spawnUnitBtn.onClick.AddListener(() =>
             {
                 selectedUnitType = unitCreationAndSpawningDatas[index].unitType;
-                GameManager.Instance.GetPlayer().GetSelectedCastle().ShowHideSpawnPositions();
+                GameManager.Instance.GetPlayer().GetSelectedCastle().ShowSpawnAreas();
             });
         }
     }
@@ -65,10 +65,18 @@ public class UnitCreationSystemUI : MonoBehaviour
     {
         for (int i = 0; i < unitCreationAndSpawningDatas.Length; i++)
         {
-            if (unitCreationAndSpawningDatas[i].unitType == unitType)
+            if (amount == 0)
             {
-                unitCreationAndSpawningDatas[i].spawnUnitBtn.GetComponent<UnitCreationUIButton>().UpdateUnitsAmount(amount);
-                break;
+                unitCreationAndSpawningDatas[i].spawnUnitBtn.interactable = false;
+            }
+            else
+            {
+                if (unitCreationAndSpawningDatas[i].unitType == unitType)
+                {
+                    unitCreationAndSpawningDatas[i].spawnUnitBtn.interactable = true;
+                    unitCreationAndSpawningDatas[i].spawnUnitBtn.GetComponent<UnitCreationUIButton>().UpdateUnitsAmount(amount);
+                    break;
+                }
             }
         }
     }
@@ -83,5 +91,10 @@ public class UnitCreationSystemUI : MonoBehaviour
                 break;
             }
         }
+    }
+
+    public UnitCreator.UnitType GetSelectedUnitType()
+    {
+        return selectedUnitType;
     }
 }

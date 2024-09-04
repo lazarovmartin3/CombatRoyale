@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Tile : MonoBehaviour
@@ -58,9 +59,14 @@ public class Tile : MonoBehaviour
         set { isSpawnableTile = value; }
     }
 
-    public void ShowHideSpawnableArea()
+    public void ShowSpawnableArea()
     {
-        spawnableAreaObject.SetActive(!spawnableAreaObject.activeSelf);
+        spawnableAreaObject.SetActive(true);
+    }
+
+    public void HideSpawnableArea()
+    {
+        spawnableAreaObject.SetActive(false);
     }
 
     public Vector2Int Position

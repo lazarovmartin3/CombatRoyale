@@ -23,6 +23,6 @@ public class UnitCreationUIButton : MonoBehaviour
 
     public void UpdateUnitsAmount(int amount)
     {
-        numOfUnitsTxt.text = amount.ToString();
+        numOfUnitsTxt.text = amount > 0 ? amount.ToString() : "";
     }
 }

@@ -1,18 +1,12 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class SpawnableAreaCreator : MonoBehaviour
 {
-    public static SpawnableAreaCreator Instance;
-
     private int areaSize = 3;
 
     private HashSet<Tile> areaTiles = new HashSet<Tile>();
-
-    private void Awake()
-    {
-        Instance = this;
-    }
 
     public void CreateSpanwableAreaAround(int x, int y, Player owner)
     {
@@ -55,15 +49,16 @@ public class SpawnableAreaCreator : MonoBehaviour
 
     public List<Tile> GetSpawnableArea(Player owner)
     {
-        List<Tile> list = new List<Tile>();
+        //List<Tile> list = new List<Tile>();
 
-        foreach(Tile tile in areaTiles)
-        {
-            if (tile.GetOwner() == owner)
-            {
-                list.Add(tile);
-            }
-        }
-        return list;
+        //foreach(Tile tile in areaTiles)
+        //{
+        //    if (tile.GetOwner() == owner)
+        //    {
+        //        list.Add(tile);
+        //    }
+        //}
+        //return list;
+        return areaTiles.ToList();
     }
 }

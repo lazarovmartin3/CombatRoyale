@@ -8,9 +8,6 @@ public class InGameHUD : MonoBehaviour
 {
     public TextMeshProUGUI goldAmountTxt;
 
-    [SerializeField]
-    private Button spawnSwordman;
-
     private void Start()
     {
       

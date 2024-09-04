@@ -17,7 +17,7 @@ public class AIPlayer : Player
 
     private void Start()
     {
-        Invoke("CreateSwordman", 2);
+        //Invoke("CreateSwordman", 2);
     }
 
     private void CreateSwordman()

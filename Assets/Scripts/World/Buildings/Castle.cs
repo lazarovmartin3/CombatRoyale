@@ -16,6 +16,13 @@ public class Castle : MonoBehaviour
     private Player owner;
     private Vector2Int position;
 
+    private SpawnableAreaCreator spawnableAreaCreator;
+
+    private void Awake()
+    {
+        spawnableAreaCreator = GetComponent<SpawnableAreaCreator>();
+    }
+
     private void Start()
     {
         levelsCost.Add(2, 100);
@@ -63,23 +70,32 @@ public class Castle : MonoBehaviour
         }
     }
 
-    public void ShowHideSpawnPositions()
+    public void ShowSpawnAreas()
     {
-        List<Tile> areas = new List<Tile>(SpawnableAreaCreator.Instance.GetSpawnableArea(owner));
+        List<Tile> areas = new List<Tile>(spawnableAreaCreator.GetSpawnableArea(owner));
+
         foreach(Tile tile in areas)
         {
-            tile.ShowHideSpawnableArea();
+            tile.ShowSpawnableArea();
         }
+        TileSelector.OnTileSelectionEvent += GetComponent<UnitCreator>().SpawnUnit;
+        GetComponent<UnitCreator>().OnAllUnitsCreatedSpawned += HideSpawnAreas;
     }
 
-    public void PrepareForSpawning(UnitCreator.UnitType unitType)
+    public void HideSpawnAreas()
     {
-        //GetComponent<UnitCreator>().ActivateSpawning(unitType);
+        List<Tile> areas = new List<Tile>(spawnableAreaCreator.GetSpawnableArea(owner));
+
+        foreach (Tile tile in areas)
+        {
+            tile.HideSpawnableArea();
+        }
+        TileSelector.OnTileSelectionEvent -= GetComponent<UnitCreator>().SpawnUnit;
     }
 
     private void CreateSpawnableArea()
     {
-        SpawnableAreaCreator.Instance.CreateSpanwableAreaAround(position.x, position.y, owner);
+        spawnableAreaCreator.CreateSpanwableAreaAround(position.x, position.y, owner);
     }
 
     public void CreateUnit(UnitCreator.UnitType unitType)

@@ -25,6 +25,9 @@ public class UnitCreator : MonoBehaviour
     private float creationTime = 2;
     private float creationTimeElapsed = 0;
 
+    //Events
+    public event Action OnAllUnitsCreatedSpawned;
+
     //private UnitType selectedUnitToSpawn;
 
     private void Start()
@@ -148,30 +151,43 @@ public class UnitCreator : MonoBehaviour
 
     public void SpawnUnit(GameObject tile)
     {
-        UnitType type = UnitType.NaN;
-        foreach(UnitType unit in createdUnits)
-        {
-            //if (unit == selectedUnitToSpawn)
-            //{
-            //    type = unit;
-            //    break;
-            //}
-        }
+        //UnitType type = UnitType.NaN;
+        //foreach(UnitType unit in createdUnits)
+        //{
+        //    //if (unit == selectedUnitToSpawn)
+        //    //{
+        //    //    type = unit;
+        //    //    break;
+        //    //}
+        //}
+        UnitType unitType = UnitCreationSystemUI.Instance.GetSelectedUnitType();
 
-        if(type != UnitType.NaN)
+        if(createdUnits.Count > 0)
         {
-            unitsByTypeList.TryGetValue(type, out GameObject prefab);
-            GameObject unitObject = Instantiate(prefab, transform.position, Quaternion.identity);
-            unitObject.GetComponent<Unit>().SetType(type);
-            unitObject.GetComponent<Unit>().SetPosition(tile.GetComponent<Tile>().Position);
-            unitObject.GetComponent<Unit>().SetOwner(GetComponent<Castle>().GetOwner());
-            createdUnits.Remove(type);
-            GetComponent<Castle>().AssignUnitToPlayer(unitObject.GetComponent<Unit>());
+            unitsByTypeList.TryGetValue(unitType, out GameObject prefab);
+            if(prefab != null)
+            {
+                GameObject unitObject = Instantiate(prefab, transform.position, Quaternion.identity);
+                unitObject.GetComponent<Unit>().SetType(unitType);
+                unitObject.GetComponent<Unit>().SetPosition(tile.GetComponent<Tile>().Position);
+                unitObject.GetComponent<Unit>().SetOwner(GetComponent<Castle>().GetOwner());
+                createdUnits.Remove(unitType);
+                GetComponent<Castle>().AssignUnitToPlayer(unitObject.GetComponent<Unit>());
+
+                UpdateCreatedUnitsUI();
+            }
+            else
+            {
+                OnAllUnitsCreatedSpawned.Invoke();
+            }
 
             //Vector2Int targetPos = GetComponent<Castle>().GetPosition();
             //targetPos = Map.Instance.GetTileInFront(targetPos.x, targetPos.y);
             //unit.GetComponent<Unit>().GoTo(targetPos);
         }
-        TileSelector.OnTileSelectionEvent -= SpawnUnit;
+        else
+        {
+            OnAllUnitsCreatedSpawned.Invoke();
+        }
     }
 }

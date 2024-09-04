@@ -35,7 +35,6 @@ public class Health : MonoBehaviour
         currentHealth = maxHealth = maxHP;
     }
 
-
     public void TakeDamage(float damage)
     {
         updateTimeElapsed = 0;
