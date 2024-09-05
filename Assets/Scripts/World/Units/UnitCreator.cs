@@ -28,8 +28,6 @@ public class UnitCreator : MonoBehaviour
     //Events
     public event Action OnAllUnitsCreatedSpawned;
 
-    //private UnitType selectedUnitToSpawn;
-
     private void Start()
     {
         for (int i = 0; i < unitTypesSetup.Length; i++)
@@ -44,12 +42,6 @@ public class UnitCreator : MonoBehaviour
         //Consider to limit the queue up to 5 units
         UpdateOrderedUnitsUI();
     }
-
-    //public void ActivateSpawning(UnitType unitType)
-    //{
-    //    TileSelector.OnTileSelectionEvent += SpawnUnit;
-    //    selectedUnitToSpawn = unitType;
-    //}
 
     private void Update()
     {
@@ -82,21 +74,31 @@ public class UnitCreator : MonoBehaviour
 
         Dictionary<UnitType, int> ready_units = new Dictionary<UnitType, int>();
 
-        for (int i = 0; i < createdUnits.Count; i++)
+        if (createdUnits.Count > 0)
         {
-            UnitType unitType = createdUnits[i];
-            if (ready_units.ContainsKey(unitType))
+            for (int i = 0; i < createdUnits.Count; i++)
             {
-                ready_units[createdUnits[i]] += 1;
+                UnitType unitType = createdUnits[i];
+                if (ready_units.ContainsKey(unitType))
+                {
+                    ready_units[createdUnits[i]] += 1;
+                }
+                else
+                {
+                    ready_units[unitType] = 1;
+                }
             }
-            else
+            foreach (var kvp in ready_units)
             {
-                ready_units[unitType] = 1;
+                UnitCreationSystemUI.Instance.UpdateCreatedUnitsAmount(kvp.Key, kvp.Value);
             }
         }
-        foreach (var kvp in ready_units)
+        else
         {
-            UnitCreationSystemUI.Instance.UpdateCreatedUnitsAmount(kvp.Key, kvp.Value);
+            foreach (var unitType in unitTypesSetup)
+            {
+                UnitCreationSystemUI.Instance.UpdateCreatedUnitsAmount(unitType.unitType, 0);
+            }
         }
     }
 
@@ -134,32 +136,9 @@ public class UnitCreator : MonoBehaviour
         }
     }
 
-    public void SpawnUnit()
-    {
-        unitsByTypeList.TryGetValue(unitsQueue[0], out GameObject prefab);
-        GameObject unit = Instantiate(prefab, transform.position, Quaternion.identity);
-        unit.GetComponent<Unit>().SetType(unitsQueue[0]);
-        unit.GetComponent<Unit>().SetPosition(GetComponent<Castle>().GetPosition());
-        unit.GetComponent<Unit>().SetOwner(GetComponent<Castle>().GetOwner());
-        unitsQueue.Remove(unitsQueue[0]);
-        GetComponent<Castle>().AssignUnitToPlayer(unit.GetComponent<Unit>());
-
-        Vector2Int targetPos = GetComponent<Castle>().GetPosition();
-        targetPos = Map.Instance.GetTileInFront(targetPos.x, targetPos.y);
-        unit.GetComponent<Unit>().GoTo(targetPos);
-    }
 
     public void SpawnUnit(GameObject tile)
     {
-        //UnitType type = UnitType.NaN;
-        //foreach(UnitType unit in createdUnits)
-        //{
-        //    //if (unit == selectedUnitToSpawn)
-        //    //{
-        //    //    type = unit;
-        //    //    break;
-        //    //}
-        //}
         UnitType unitType = UnitCreationSystemUI.Instance.GetSelectedUnitType();
 
         if(createdUnits.Count > 0)
@@ -167,7 +146,7 @@ public class UnitCreator : MonoBehaviour
             unitsByTypeList.TryGetValue(unitType, out GameObject prefab);
             if(prefab != null)
             {
-                GameObject unitObject = Instantiate(prefab, transform.position, Quaternion.identity);
+                GameObject unitObject = Instantiate(prefab, tile.transform.position, Quaternion.identity);
                 unitObject.GetComponent<Unit>().SetType(unitType);
                 unitObject.GetComponent<Unit>().SetPosition(tile.GetComponent<Tile>().Position);
                 unitObject.GetComponent<Unit>().SetOwner(GetComponent<Castle>().GetOwner());
@@ -175,15 +154,16 @@ public class UnitCreator : MonoBehaviour
                 GetComponent<Castle>().AssignUnitToPlayer(unitObject.GetComponent<Unit>());
 
                 UpdateCreatedUnitsUI();
+
+                if (createdUnits.Count == 0)
+                {
+                    OnAllUnitsCreatedSpawned.Invoke();
+                }
             }
             else
             {
                 OnAllUnitsCreatedSpawned.Invoke();
             }
-
-            //Vector2Int targetPos = GetComponent<Castle>().GetPosition();
-            //targetPos = Map.Instance.GetTileInFront(targetPos.x, targetPos.y);
-            //unit.GetComponent<Unit>().GoTo(targetPos);
         }
         else
         {

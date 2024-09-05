@@ -68,6 +68,7 @@ public class UnitCreationSystemUI : MonoBehaviour
             if (amount == 0)
             {
                 unitCreationAndSpawningDatas[i].spawnUnitBtn.interactable = false;
+                unitCreationAndSpawningDatas[i].spawnUnitBtn.GetComponent<UnitCreationUIButton>().UpdateUnitsAmount(amount);
             }
             else
             {

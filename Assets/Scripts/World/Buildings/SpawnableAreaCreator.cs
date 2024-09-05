@@ -4,61 +4,47 @@ using UnityEngine;
 
 public class SpawnableAreaCreator : MonoBehaviour
 {
-    private int areaSize = 3;
+    private int areaSize = 2;
 
     private HashSet<Tile> areaTiles = new HashSet<Tile>();
 
     public void CreateSpanwableAreaAround(int x, int y, Player owner)
     {
-        for (int i = x; i < x + areaSize; i++)
-        {
-            if (i < Map.Instance.MapSizeX())
-            {
-                Map.Instance.SetSpawnableTile(i, y, true, owner);
-                areaTiles.Add(Map.Instance.GetTileAt(i, y));
-            }
-        }
+        areaTiles.Clear(); // Clear any previous area tiles
 
-        for (int i = x; i > x - areaSize; i--)
-        {
-            if (i > 0)
-            {
-                Map.Instance.SetSpawnableTile(i, y, true, owner);
-                areaTiles.Add(Map.Instance.GetTileAt(i, y));
-            }
-        }
+        int mapSizeX = Map.Instance.MapSizeX();
+        int mapSizeY = Map.Instance.MapSizeY();
 
-        for (int i = y; i < y + areaSize; i++)
+        for (int dx = -areaSize; dx <= areaSize; dx++)
         {
-            if (i < Map.Instance.MapSizeY())
+            for (int dy = -areaSize; dy <= areaSize; dy++)
             {
-                Map.Instance.SetSpawnableTile(x, i, true, owner);
-                areaTiles.Add(Map.Instance.GetTileAt(x, i));
-            }
-        }
+                int newX = x + dx;
+                int newY = y + dy;
 
-        for (int i = y; i > y - areaSize; i--)
-        {
-            if (i > 0)
-            {
-                Map.Instance.SetSpawnableTile(x, i, true, owner);
-                areaTiles.Add(Map.Instance.GetTileAt(x, i));
+                // Check if within circular area and within map bounds
+                if (IsWithinCircle(x, y, newX, newY) && IsWithinMapBounds(newX, newY, mapSizeX, mapSizeY))
+                {
+                    Map.Instance.SetSpawnableTile(newX, newY, true, owner);
+                    areaTiles.Add(Map.Instance.GetTileAt(newX, newY));
+                }
             }
         }
     }
 
+    private bool IsWithinCircle(int centerX, int centerY, int x, int y)
+    {
+        return (x - centerX) * (x - centerX) + (y - centerY) * (y - centerY) <= areaSize * areaSize;
+    }
+
+    private bool IsWithinMapBounds(int x, int y, int mapSizeX, int mapSizeY)
+    {
+        return x >= 0 && x < mapSizeX && y >= 0 && y < mapSizeY;
+    }
+
+
     public List<Tile> GetSpawnableArea(Player owner)
     {
-        //List<Tile> list = new List<Tile>();
-
-        //foreach(Tile tile in areaTiles)
-        //{
-        //    if (tile.GetOwner() == owner)
-        //    {
-        //        list.Add(tile);
-        //    }
-        //}
-        //return list;
         return areaTiles.ToList();
     }
 }

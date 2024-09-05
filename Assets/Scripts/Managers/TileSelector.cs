@@ -12,18 +12,18 @@ public class TileSelector : MonoBehaviour
 
     void Start()
     {
-        
+
     }
 
     void Update()
     {
-        if(Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0))
         {
             OnTileSelectionEvent?.Invoke(GetSelectedTile());
             isFingerDown = true;
         }
 
-        if(Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0))
         {
             isFingerDown = false;
         }
@@ -43,14 +43,16 @@ public class TileSelector : MonoBehaviour
     {
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        GameObject tile = null;
 
         if (Physics.Raycast(ray, out hit, 100))
         {
-            if (hit.collider.gameObject.GetComponent<Tile>() != null && hit.collider.gameObject.GetComponent<Tile>().IsSpawnable)
+            if (hit.collider.gameObject.GetComponentInParent<Tile>() != null && hit.collider.gameObject.GetComponentInParent<Tile>().IsSpawnable)
             {
-                return hit.collider.gameObject;
+                tile = hit.collider.gameObject.transform.parent.gameObject;
             }
         }
-        return null;
+
+        return tile;
     }
 }

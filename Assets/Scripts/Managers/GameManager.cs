@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour
     {
         Map.Instance.GenerateMap();
 
-        CreateNewPlayer(5, 0, new Vector3(-90, -180, 90), GetDataByColor(PlayerColors.blue));
+        CreateNewPlayer(5, 0, new Vector3(-90, -180, 90), GetDataByColor(PlayerColors.red));
         CreateNewPlayer(5, 9, new Vector3(-90, 0, 90), GetDataByColor(PlayerColors.green), true);
     }
 
@@ -63,6 +63,7 @@ public class GameManager : MonoBehaviour
             players.Add(playerObject.GetComponent<HumanPlayer>());
         }
         castle.GetComponent<Castle>().SetGridPosition(posX, posY);
+        castle.GetComponent<Castle>().CreateSpawnableArea();
     }
 
     public HumanPlayer GetPlayer()

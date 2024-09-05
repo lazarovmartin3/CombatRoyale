@@ -38,7 +38,6 @@ public class Castle : MonoBehaviour
     public void SetOwner(Player owner)
     {
         this.owner = owner;
-        CreateSpawnableArea();
     }
 
     public Player GetOwner()
@@ -93,7 +92,7 @@ public class Castle : MonoBehaviour
         TileSelector.OnTileSelectionEvent -= GetComponent<UnitCreator>().SpawnUnit;
     }
 
-    private void CreateSpawnableArea()
+    public void CreateSpawnableArea()
     {
         spawnableAreaCreator.CreateSpanwableAreaAround(position.x, position.y, owner);
     }
