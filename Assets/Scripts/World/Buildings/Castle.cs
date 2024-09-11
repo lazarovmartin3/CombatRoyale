@@ -99,10 +99,11 @@ public class Castle : MonoBehaviour
 
     public void CreateUnit(UnitCreator.UnitType unitType)
     {
-        if (owner.GetGold() >= 100)
+        int cost = GetComponent<UnitCreator>().GetUnitCost(unitType);
+        if (owner.GetGold() >= cost)
         {
             GetComponent<UnitCreator>().CreateUnit(unitType);
-            owner.AddRemoveGold(-100);
+            owner.AddRemoveGold(-cost);
         }
         else
         {

@@ -9,7 +9,7 @@ public class Map : MonoBehaviour
     public GameObject tilePrefab;
     private int sizeX, sizeY;
     private GameObject[,] field;
-    private float tileOffset = 10;
+    private float tileOffset = 5;
 
     private Node[,] grid;
 
@@ -20,7 +20,7 @@ public class Map : MonoBehaviour
 
     public void GenerateMap()
     {
-        sizeX = 10;
+        sizeX = 8;
         sizeY = 10;
         field = new GameObject[sizeX, sizeY];
         grid = new Node[sizeX, sizeY];
@@ -31,7 +31,7 @@ public class Map : MonoBehaviour
             {
                 Vector3 position = new Vector3(this.transform.position.x + x * tileOffset, 0, this.transform.position.y + y * tileOffset);
                 GameObject tile = Instantiate(tilePrefab, position, Quaternion.identity);
-                tile.name = $"{ x + "," + y}";
+                tile.name = $"{x},{y}";
                 tile.transform.SetParent(this.transform);
                 tile.GetComponent<Tile>().Position = new Vector2Int(x, y);
 

@@ -13,6 +13,7 @@ public class UnitCreator : MonoBehaviour
     {
         public UnitType unitType;
         public GameObject prefab;
+        public int cost;
     }
 
     [SerializeField]
@@ -169,5 +170,18 @@ public class UnitCreator : MonoBehaviour
         {
             OnAllUnitsCreatedSpawned.Invoke();
         }
+    }
+
+    public int GetUnitCost(UnitType unitType)
+    {
+        for (int i = 0; i < unitTypesSetup.Length; i++)
+        {
+            if (unitTypesSetup[i].unitType == unitType)
+            {
+                return unitTypesSetup[i].cost;
+            }
+        }
+
+        return 0;
     }
 }
