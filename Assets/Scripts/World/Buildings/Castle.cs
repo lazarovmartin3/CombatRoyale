@@ -97,6 +97,11 @@ public class Castle : MonoBehaviour
         spawnableAreaCreator.CreateSpanwableAreaAround(position.x, position.y, owner);
     }
 
+    public List<Tile> GetSpawnableArea()
+    {
+        return spawnableAreaCreator.GetSpawnableArea(owner);
+    }
+
     public void CreateUnit(UnitCreator.UnitType unitType)
     {
         int cost = GetComponent<UnitCreator>().GetUnitCost(unitType);

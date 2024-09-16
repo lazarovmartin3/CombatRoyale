@@ -147,7 +147,9 @@ public class UnitCreator : MonoBehaviour
             unitsByTypeList.TryGetValue(unitType, out GameObject prefab);
             if(prefab != null)
             {
-                GameObject unitObject = Instantiate(prefab, tile.transform.position, Quaternion.identity);
+                Vector3 position = tile.GetComponent<MeshCollider>().bounds.center;
+                position.z = UnityEngine.Random.Range(tile.GetComponent<MeshCollider>().bounds.min.z, tile.GetComponent<MeshCollider>().bounds.max.z);
+                GameObject unitObject = Instantiate(prefab, position, Quaternion.identity, transform);
                 unitObject.GetComponent<Unit>().SetType(unitType);
                 unitObject.GetComponent<Unit>().SetPosition(tile.GetComponent<Tile>().Position);
                 unitObject.GetComponent<Unit>().SetOwner(GetComponent<Castle>().GetOwner());
@@ -156,19 +158,21 @@ public class UnitCreator : MonoBehaviour
 
                 UpdateCreatedUnitsUI();
 
-                if (createdUnits.Count == 0)
+                if (createdUnits.Count == 0 && GetComponent<Castle>().GetOwner() is HumanPlayer)
                 {
                     OnAllUnitsCreatedSpawned.Invoke();
                 }
             }
             else
             {
-                OnAllUnitsCreatedSpawned.Invoke();
+                if (GetComponent<Castle>().GetOwner() is HumanPlayer)
+                    OnAllUnitsCreatedSpawned.Invoke();
             }
         }
         else
         {
-            OnAllUnitsCreatedSpawned.Invoke();
+            if (GetComponent<Castle>().GetOwner() is HumanPlayer)
+                OnAllUnitsCreatedSpawned.Invoke();
         }
     }
 

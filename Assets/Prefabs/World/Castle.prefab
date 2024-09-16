@@ -115,6 +115,7 @@ MonoBehaviour:
   - unitType: 0
     prefab: {fileID: 2861777817067074137, guid: 59f659339eb6d144d856d3ed43968814,
       type: 3}
+    cost: 100
 --- !u!114 &2989124207206889117
 MonoBehaviour:
   m_ObjectHideFlags: 0

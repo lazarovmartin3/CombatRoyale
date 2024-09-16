@@ -23,6 +23,7 @@ public class AIPlayer : Player
     {
         base.InitPlayer(startGold, castle, initData);
         aiCastle = castle as Castle;
+        aiCastle.CreateSpawnableArea();
         currentState = AIState.Idle;
     }
 
@@ -39,6 +40,7 @@ public class AIPlayer : Player
             MakeDecision();
             nextDecisionTime = Time.time + decisionInterval; // Schedule the next decision
         }
+        print("AI GOLD " + GetGold() + " c_s " + currentState);
     }
 
     private void MakeDecision()
@@ -54,12 +56,12 @@ public class AIPlayer : Player
             case AIState.GatheringResources:
                 HandleGatheringResourcesState();
             break;
-                //case AIState.Attack:
-                //    HandleAttackState();s
-                //break;
-                //case AIState.Defend:
-                //    HandleDefendState();
-                //    break;
+            case AIState.Attack:
+                HandleAttackState();
+                break;
+            case AIState.Defend:
+                HandleDefendState();
+                break;
         }
     }
 
@@ -98,6 +100,8 @@ public class AIPlayer : Player
         {
             TransitionToState(AIState.Attack);
         }
+
+        aiCastle.GetComponent<UnitCreator>().SpawnUnit(aiCastle.GetSpawnableArea()[0].gameObject);
     }
 
     private void HandleAttackState()
@@ -146,6 +150,6 @@ public class AIPlayer : Player
 
     private void CreateUnit(UnitCreator.UnitType unitType)
     {
-
+        aiCastle.CreateUnit(unitType);
     }
 }
