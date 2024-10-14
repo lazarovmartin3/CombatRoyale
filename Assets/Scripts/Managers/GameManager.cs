@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
         Map.Instance.GenerateMap();
 
         CreateNewPlayer(5, 0, new Vector3(-90, -180, 90), GetDataByColor(PlayerColors.red));
-        CreateNewPlayer(5, 9, new Vector3(-90, 0, 90), GetDataByColor(PlayerColors.green), true);
+        //CreateNewPlayer(5, 9, new Vector3(-90, 0, 90), GetDataByColor(PlayerColors.green), true);
     }
 
     private void CreateNewPlayer(int posX, int posY, Vector3 rotation, PlayerInitData data, bool isAI = false)
